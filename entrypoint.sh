@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
@@ -12,16 +12,16 @@ then
   if [ ! -z "${TRANSMISSION_USER_ID}" ];
   then
     echo "Changing UID to $TRANSMISSION_USER_ID"
-    usermod -u $TRANSMISSION_USER_ID -o debian-transmission
+    usermod -u $TRANSMISSION_USER_ID -o transmission
   fi
 
   if [ ! -z "${TRANSMISSION_GROUP_ID}" ];
   then
     echo "Changing GID to $TRANSMISSION_GROUP_ID"
-    groupmod -g $TRANSMISSION_GROUP_ID -o debian-transmission
+    groupmod -g $TRANSMISSION_GROUP_ID -o transmission
   fi
 
-  exec gosu debian-transmission "$@"
+  exec gosu transmission "$@"
 fi
 
 exec "$@"

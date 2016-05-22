@@ -1,15 +1,16 @@
-FROM debian:jessie
+FROM alpine:3.3
 
-# Update packages and install software
-ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates \
-        wget \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk add --update \
+    openvpn \
+    transmission-daemon \
+    && rm -rf /var/cache/apk/*
 
 ENV GOSU_VERSION 1.7
 RUN set -x \
+    && apk add --no-cache --virtual .gosu-deps \
+        dpkg \
+        gnupg \
+        openssl \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
@@ -17,33 +18,16 @@ RUN set -x \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true
+    && gosu nobody true \
+    && apk del .gosu-deps
 
-RUN apt-get update && apt-get install -y \
-    software-properties-common \
- && rm -rf /var/lib/apt/lists/*
+RUN apk add --update gettext && rm -rf /var/cache/apk/*
 
-RUN apt-get update && apt-get install -y \
-    curl \
-    openvpn \
-    transmission-cli \
-    transmission-common \
-    transmission-daemon \
-&& rm -rf /var/lib/apt/lists/*
-# pmisc needed to get killall,
-# gettext-base needed to get envsubst
-RUN apt-get update && apt-get install -y \
-    gettext-base \
-    psmisc \
-&& rm -rf /var/lib/apt/lists/*
-
-RUN rm -rf /tmp/* /var/tmp/*
-
-RUN mkdir /etc/transmission && chown debian-transmission:debian-transmission /etc/transmission
+RUN mkdir /etc/transmission && chown transmission:transmission /etc/transmission
 
 COPY settings.json.tmpl /etc/transmission/
 
-RUN mkdir /config && chown debian-transmission:debian-transmission /config
+RUN mkdir /config && chown transmission:transmission /config
 
 COPY entrypoint.sh /
 COPY transmission-daemon.sh /
@@ -68,7 +52,7 @@ ENV "OPENVPN_USERNAME=" \
     "TRANSMISSION_UMASK=2" \
     "TRANSMISSION_HOME=/etc/transmission"
 
-RUN mkdir /data && chown debian-transmission:debian-transmission /data
+RUN mkdir /data && chown transmission:transmission /data
 VOLUME /data
 
 # Expose port and run
