@@ -3,6 +3,7 @@ FROM alpine:3.3
 RUN apk add --update \
     openvpn \
     transmission-daemon \
+    wget \
     && rm -rf /var/cache/apk/*
 
 ENV GOSU_VERSION 1.7
