@@ -4,6 +4,7 @@ set -e
 
 if [ ! -z "${OPENVPN_USERNAME}" ];
 then
+  echo "Waiting for OpenVPN ..."
   until ip addr show dev tun0 &>/dev/null;
   do
     sleep 1
