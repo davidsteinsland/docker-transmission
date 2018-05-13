@@ -33,27 +33,27 @@ RUN mkdir /config && chown transmission:transmission /config
 COPY entrypoint.sh /
 COPY transmission-daemon.sh /
 
-ENV "OPENVPN_USERNAME=" \
-    "OPENVPN_PASSWORD=" \
-    "PIA_CLIENT_ID_FILE=/etc/transmission/pia_client_id" \
-    "TRANSMISSION_USER_ID=" \
-    "TRANSMISSION_GROUP_ID=" \
-    "TRANSMISSION_BLOCKLIST_URL=http://john.bitsurge.net/public/biglist.p2p.gz" \
-    "TRANSMISSION_BLOCKLIST_ENABLED=false" \
-    "TRANSMISSION_DOWNLOAD_DIR=/data/completed" \
-    "TRANSMISSION_INCOMPLETE_DIR=/data/incompleted" \
-    "TRANSMISSION_INCOMPLETE_ENABLED=false" \
-    "TRANSMISSION_RATIO_LIMIT=0.0" \
-    "TRANSMISSION_RPC_BIND_ADDRESS=" \
-    "TRANSMISSION_RPC_PASSWORD=password" \
-    "TRANSMISSION_RPC_PORT=9091" \
-    "TRANSMISSION_RPC_URL=/transmission/" \
-    "TRANSMISSION_RPC_USERNAME=username" \
-    "TRANSMISSION_RPC_WHITELIST=" \
-    "TRANSMISSION_SPEED_LIMIT_UP=100" \
-    "TRANSMISSION_SPEED_LIMIT_ENABLED=false" \
-    "TRANSMISSION_UMASK=2" \
-    "TRANSMISSION_HOME=/etc/transmission"
+ENV OPENVPN_USERNAME="" \
+    OPENVPN_PASSWORD="" \
+    PIA_CLIENT_ID_FILE="/etc/transmission/pia_client_id" \
+    TRANSMISSION_USER_ID="" \
+    TRANSMISSION_GROUP_ID="" \
+    TRANSMISSION_BLOCKLIST_URL="http://john.bitsurge.net/public/biglist.p2p.gz" \
+    TRANSMISSION_BLOCKLIST_ENABLED="false" \
+    TRANSMISSION_DOWNLOAD_DIR="/data/completed" \
+    TRANSMISSION_INCOMPLETE_DIR="/data/incompleted" \
+    TRANSMISSION_INCOMPLETE_ENABLED="false" \
+    TRANSMISSION_RATIO_LIMIT="0.0" \
+    TRANSMISSION_RPC_BIND_ADDRESS="" \
+    TRANSMISSION_RPC_PASSWORD="password" \
+    TRANSMISSION_RPC_PORT="9091" \
+    TRANSMISSION_RPC_URL="/transmission/" \
+    TRANSMISSION_RPC_USERNAME="username" \
+    TRANSMISSION_RPC_WHITELIST="" \
+    TRANSMISSION_SPEED_LIMIT_UP="100" \
+    TRANSMISSION_SPEED_LIMIT_ENABLED="false" \
+    TRANSMISSION_UMASK="2" \
+    TRANSMISSION_HOME="/etc/transmission"
 
 RUN mkdir /data && chown transmission:transmission /data
 VOLUME /data
