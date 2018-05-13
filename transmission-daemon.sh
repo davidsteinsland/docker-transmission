@@ -44,7 +44,7 @@ then
   if [ ! -f "${PIA_CLIENT_ID_FILE}" ];
   then
     echo "Generating new client ID"
-    head -n 100 /dev/urandom | md5sum | tr -d " -" | tee $PIA_CLIENT_ID_FILE
+    head -n 100 /dev/urandom | sha256sum | tr -d " -" | tee $PIA_CLIENT_ID_FILE
   fi
 
   echo "Fetching client ID from ${PIA_CLIENT_ID_FILE}"
