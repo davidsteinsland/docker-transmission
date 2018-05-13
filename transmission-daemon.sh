@@ -74,6 +74,7 @@ echo "Using port $TRANSMISSION_PEER_PORT"
 # substitute configuration file with environmental variables
 envsubst < /etc/transmission/settings.json.tmpl > $TRANSMISSION_HOME/settings.json
 
+set -x
 TRANSMISSION_OPTS="--bind-address-ipv4 $TRANSMISSION_BIND_ADDRESS_IPV4
    --peerport $TRANSMISSION_PEER_PORT
    --rpc-bind-address $TRANSMISSION_RPC_BIND_ADDRESS
