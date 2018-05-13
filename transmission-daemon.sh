@@ -54,11 +54,13 @@ then
   echo 'Loading port forward assignment information..'
 
   _PIA_RESPONSE=$(curl "http://209.222.18.222:2000/?client_id=$PIA_CLIENT_ID" 2>/dev/null)
+  echo $_PIA_RESPONSE
   if [ "${_PIA_RESPONSE}" == "" ]; then
     echo "Port forwarding is already activated on this connection, has expired, or you are not connected to a PIA region that supports port forwarding"
     exit 1
   fi
   export TRANSMISSION_PEER_PORT=$(echo $_PIA_RESPONSE | head -1 | grep -oE "[0-9]+")
+  echo "Using port $TRANSMISSION_PEER_PORT"
 fi
 
 if [ -z "${TRANSMISSION_PEER_PORT}" ];
