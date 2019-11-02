@@ -39,37 +39,9 @@ fi
 
 echo "Using IP $TRANSMISSION_BIND_ADDRESS_IPV4"
 
-if [ ! -z "${OPENVPN_USERNAME}" ];
-then
-  if [ -z "${TRANSMISSION_PEER_PORT}" ];
-  then
-    if [ ! -f "${PIA_CLIENT_ID_FILE}" ];
-    then
-      echo "Generating new client ID"
-      head -n 100 /dev/urandom | sha256sum | tr -d " -" | tee $PIA_CLIENT_ID_FILE
-    fi
-
-    echo "Fetching client ID from ${PIA_CLIENT_ID_FILE}"
-
-    PIA_CLIENT_ID=$(cat $PIA_CLIENT_ID_FILE)
-
-    echo 'Loading port forward assignment information..'
-
-    _PIA_RESPONSE=$(curl "http://209.222.18.222:2000/?client_id=$PIA_CLIENT_ID")
-    echo $_PIA_RESPONSE
-    if [ "${_PIA_RESPONSE}" == "" ]; then
-      echo "Port forwarding is already activated on this connection, has expired, or you are not connected to a PIA region that supports port forwarding"
-      exit 1
-    fi
-    export TRANSMISSION_PEER_PORT=$(echo $_PIA_RESPONSE | head -1 | grep -oE "[0-9]+")
-    echo "Using port $TRANSMISSION_PEER_PORT"
-  fi
-fi
-
 if [ -z "${TRANSMISSION_PEER_PORT}" ];
 then
-  echo "Failed to fetch port number"
-  exit 1
+  TRANSMISSION_PEER_PORT="1337"
 fi
 
 echo "Using port $TRANSMISSION_PEER_PORT"
@@ -85,4 +57,12 @@ TRANSMISSION_OPTS="--bind-address-ipv4 $TRANSMISSION_BIND_ADDRESS_IPV4
    --global-seedratio $TRANSMISSION_RATIO_LIMIT
    --config-dir $TRANSMISSION_HOME"
 
+echo "Up script:"
+echo $TRANSMISSION_UP_SCRIPT
+if [ -f $TRANSMISSION_UP_SCRIPT ];
+then
+  . $TRANSMISSION_UP_SCRIPT
+fi
+
 exec transmission-daemon --foreground ${TRANSMISSION_OPTS}
+
