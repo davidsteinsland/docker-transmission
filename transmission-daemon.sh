@@ -2,19 +2,6 @@
 
 set -e
 
-_LAN_IP=$(ip addr show eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*')
-_LAN_SUBNET=$(ip -o addr show eth0 | awk '$3 == "inet" { print $4 }')
-
-if [ -z "${TRANSMISSION_RPC_BIND_ADDRESS}" ];
-then
-  export TRANSMISSION_RPC_BIND_ADDRESS=$_LAN_IP
-fi
-
-if [ -z "${TRANSMISSION_RPC_WHITELIST}" ];
-then
-  export TRANSMISSION_RPC_WHITELIST=$_LAN_SUBNET
-fi
-
 # make sure transmission directory is setup OK
 if [ ! -d "${TRANSMISSION_HOME}" ];
 then
@@ -31,13 +18,32 @@ then
   mkdir -p "${TRANSMISSION_INCOMPLETE_DIR}"
 fi
 
-if ip -o addr show dev tun0;
+echo "Waiting for ip on $TRANSMISSION_BIND_INTERFACE..."
+until ip addr show dev $TRANSMISSION_BIND_INTERFACE &>/dev/null;
+do
+  sleep 1
+done
+until ip addr show dev $TRANSMISSION_RPC_BIND_INTERFACE &>/dev/null;
+do
+  sleep 1
+done
+
+BIND_INTERFACE_IP=$(ip -o addr show dev $TRANSMISSION_BIND_INTERFACE | awk '{print $4}')
+RPC_BIND_INTERFACE_IP=$(ip -o addr show dev $TRANSMISSION_RPC_BIND_INTERFACE | awk '{print $4}')
+
+if [ -z "${TRANSMISSION_BIND_ADDRESS_IPV4}" ];
 then
-  _VPN_IP=$(ip -o addr show dev tun0 | awk '{print $4}')
-  export TRANSMISSION_BIND_ADDRESS_IPV4=$_VPN_IP
+  export TRANSMISSION_BIND_ADDRESS_IPV4=$BIND_INTERFACE_IP
 fi
 
-echo "Using IP $TRANSMISSION_BIND_ADDRESS_IPV4"
+if [ -z "${TRANSMISSION_RPC_BIND_ADDRESS}" ];
+then
+  export TRANSMISSION_RPC_BIND_ADDRESS=$RPC_BIND_INTERFACE_IP
+fi
+
+echo "Bind address: $TRANSMISSION_BIND_ADDRESS_IPV4"
+echo "RPC Bind address: $TRANSMISSION_RPC_BIND_ADDRESS"
+echo "RPC whitelist: $TRANSMISSION_RPC_WHITELIST"
 
 if [ -z "${TRANSMISSION_PEER_PORT}" ];
 then
