@@ -29,7 +29,7 @@ do
 done
 
 BIND_INTERFACE_IP=$(ip -o addr show dev $TRANSMISSION_BIND_INTERFACE | awk '{print $4}')
-RPC_BIND_INTERFACE_IP=$(ip -o addr show dev $TRANSMISSION_RPC_BIND_INTERFACE | awk '{print $4}')
+RPC_BIND_INTERFACE_IP=$(ip -o addr show $TRANSMISSION_RPC_BIND_INTERFACE | awk '{print $4}' | grep -Eo '([0-9]*\.){3}[0-9]*')
 
 if [ -z "${TRANSMISSION_BIND_ADDRESS_IPV4}" ];
 then
