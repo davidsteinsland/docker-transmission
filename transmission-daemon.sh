@@ -31,7 +31,7 @@ then
   mkdir -p "${TRANSMISSION_INCOMPLETE_DIR}"
 fi
 
-if [ ! -z "${OPENVPN_USERNAME}" ];
+if ip -o addr show dev tun0;
 then
   _VPN_IP=$(ip -o addr show dev tun0 | awk '{print $4}')
   export TRANSMISSION_BIND_ADDRESS_IPV4=$_VPN_IP
@@ -49,6 +49,13 @@ echo "Using port $TRANSMISSION_PEER_PORT"
 # substitute configuration file with environmental variables
 envsubst < /etc/transmission/settings.json.tmpl > $TRANSMISSION_HOME/settings.json
 
+echo "Up script:"
+echo $TRANSMISSION_UP_SCRIPT
+if [ -f $TRANSMISSION_UP_SCRIPT ];
+then
+  eval $TRANSMISSION_UP_SCRIPT &
+fi
+
 set -x
 TRANSMISSION_OPTS="--bind-address-ipv4 $TRANSMISSION_BIND_ADDRESS_IPV4
    --peerport $TRANSMISSION_PEER_PORT
@@ -56,13 +63,6 @@ TRANSMISSION_OPTS="--bind-address-ipv4 $TRANSMISSION_BIND_ADDRESS_IPV4
    --encryption-preferred
    --global-seedratio $TRANSMISSION_RATIO_LIMIT
    --config-dir $TRANSMISSION_HOME"
-
-echo "Up script:"
-echo $TRANSMISSION_UP_SCRIPT
-if [ -f $TRANSMISSION_UP_SCRIPT ];
-then
-  . $TRANSMISSION_UP_SCRIPT
-fi
 
 exec transmission-daemon --foreground ${TRANSMISSION_OPTS}
 

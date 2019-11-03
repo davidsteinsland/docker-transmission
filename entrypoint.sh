@@ -2,15 +2,6 @@
 
 set -e
 
-if [ ! -z "${OPENVPN_USERNAME}" ];
-then
-  echo "Waiting for OpenVPN ..."
-  until ip addr show dev tun0 &>/dev/null;
-  do
-    sleep 1
-  done
-fi
-
 if [ $(id -u) -eq 0 -a "$1" = '/transmission-daemon.sh' ];
 then
   if [ ! -z "${TRANSMISSION_USER_ID}" ];
