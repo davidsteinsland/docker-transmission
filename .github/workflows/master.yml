@@ -1,0 +1,24 @@
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: create docker tag
+      env:
+        DOCKER_IMAGE: docker.pkg.github.com/${{ github.repository }}/transmission
+      run: |
+        echo $DOCKER_IMAGE > .docker_image
+        echo $(echo $GITHUB_SHA | cut -c1-7) > .docker_tag
+    - name: build docker image
+      run: docker build . --pull -t $(cat .docker_image):$(cat .docker_tag)
+    - name: push docker image
+      run: |
+        echo "$GITHUB_TOKEN" | docker login --username "x-access-token" --password-stdin https://docker.pkg.github.com
+        docker push $(cat .docker_image):$(cat .docker_tag)
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
